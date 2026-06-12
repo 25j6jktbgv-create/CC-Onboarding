@@ -87,8 +87,8 @@ body{
 .row:not(:last-child)::after{content:''; position:absolute; left:54px; right:0; bottom:0; height:1px; background:var(--sep)}
 .row.ni:not(:last-child)::after{left:14px}
 .row .tx{flex:1; min-width:0}
-.row .tt{font-size:16px; font-weight:600; line-height:1.25}
-.row .td{font-size:13px; color:var(--ink2); margin-top:2px; line-height:1.35}
+.row .tt,.ihint .tt{font-size:16px; font-weight:600; line-height:1.25}
+.row .td,.ihint .td{font-size:13px; color:var(--ink2); margin-top:2px; line-height:1.35}
 .chev{color:var(--ink3); flex:none; font-size:17px; font-weight:600}
 
 .ic{width:30px; height:30px; border-radius:9px; flex:none; display:grid; place-items:center; font-size:16px; color:#fff}
@@ -165,6 +165,9 @@ body{
 .fq.open .a{max-height:240px}
 .fq .ar{transition:transform .3s var(--spring); color:var(--ink3); flex:none}
 .fq.open .ar{transform:rotate(90deg)}
+
+/* Installations-Hinweis */
+.ihint{display:flex; gap:12px; align-items:center; margin-top:16px; padding:14px}
 
 /* Statistik */
 .stats{display:flex; text-align:center}
@@ -275,11 +278,10 @@ body{
 <script>
 'use strict';
 /* ================= Version & Changelog ================= */
-const APP_VERSION = 'v2';
+const APP_VERSION = 'v3';
 const CHANGES = [
-  'Layout passt sich allen Displaygrößen an – iPhone, iPad & Desktop',
-  'Fortschrittszeilen brechen nicht mehr um',
-  'Startkarte aufgeräumt & Schrift-Rendering verbessert'
+  'Installations-Hinweis, wenn die App im Browser statt als App läuft',
+  'Feinschliff unter der Haube'
 ];
 
 /* ================= Daten-Helfer ================= */
@@ -288,7 +290,7 @@ function ld(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse
 function sv(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
 
 function defState(){
-  return { v:1, setup:false, pup:false,
+  return { v:1, setup:false, pup:false, iHint:false,
     profile:{ name:'', start:todayISO(), ort:'' },
     done:{}, met:{}, names:{} };
 }
@@ -379,6 +381,15 @@ const TIPS = [
 const DAYS_TOTAL = 90;
 
 /* ================= Abgeleitete Werte ================= */
+function isStandalone(){
+  return navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+}
+function needIHint(){
+  const ios = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  return ios && !isStandalone() && !S.iHint;
+}
+function hideIHint(){ S.iHint = true; save(); rHome(); }
+
 function phaseFor(day){ if(day < 1) return 'p0'; if(day <= 7) return 'p1'; if(day <= 30) return 'p2'; return 'p3'; }
 function phaseStats(pid){
   const ts = TASKS.filter(t => t.p === pid);
@@ -429,6 +440,14 @@ function rHome(){
           'style="transition:stroke-dashoffset .8s ease"/>' +
       '</svg><div class="num" id="ringTxt">' + pct + '%</div></div></div>' +
     '</div>' +
+
+    (needIHint() ?
+      '<div class="card ihint">' +
+        '<div class="ic" style="background:var(--curSoft);color:var(--cur);width:38px;height:38px;border-radius:11px;font-size:19px">📲</div>' +
+        '<div class="tx" style="flex:1"><div class="tt" style="font-size:15px">Als App installieren</div>' +
+        '<div class="td">Tippe in Safari auf das Teilen-Symbol und wähle „Zum Home-Bildschirm“. Dann läuft die App im Vollbild – ohne Browser-Leiste.</div></div>' +
+        '<button class="edit" onclick="hideIHint()" aria-label="Hinweis ausblenden">✕</button>' +
+      '</div>' : '') +
 
     '<div class="sec">Als Nächstes<small id="nxCount"></small></div>' +
     '<div id="nextWrap"></div>' +
