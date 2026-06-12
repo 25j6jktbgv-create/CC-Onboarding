@@ -52,7 +52,9 @@ body{
   -webkit-user-select:none; user-select:none;
   overscroll-behavior:none;
 }
-#app{position:fixed; inset:0; overflow:hidden}
+/* height:var(--vph,100%): --vph wird nur per JS gesetzt, wenn iOS 26 den
+   Standalone-Viewport zu kurz meldet (Bug 158055568 / WebKit #313800) */
+#app{position:fixed; top:0; left:0; width:100%; height:var(--vph, 100%); overflow:hidden}
 
 /* ---------- Seiten ---------- */
 .pg{position:absolute; inset:0; overflow-y:auto; -webkit-overflow-scrolling:touch;
@@ -177,7 +179,7 @@ body{
 .stats>div:not(:last-child){border-right:1px solid var(--sep)}
 
 /* ---------- Tab-Leiste ---------- */
-#tabbar{position:fixed; left:0; right:0; bottom:0; z-index:50; display:flex;
+#tabbar{position:absolute; left:0; right:0; bottom:0; z-index:50; display:flex;
   padding:6px 10px calc(min(env(safe-area-inset-bottom, 0px), 30px) + 4px);
   background:var(--frost); -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
   border-top:1px solid var(--sep)}
@@ -190,7 +192,7 @@ body{
 .tb.on{color:var(--cur)}
 
 /* ---------- Overlay / Sheets ---------- */
-#ovl{position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center;
+#ovl{position:absolute; inset:0; z-index:100; display:none; align-items:center; justify-content:center;
   padding:24px; background:rgba(0,0,0,.45); -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px)}
 #ovl.show{display:flex}
 .sheet{background:var(--card); border-radius:26px; padding:24px; width:100%; max-width:400px;
@@ -208,17 +210,18 @@ body{
 .chlist li::before{content:'✦'; color:var(--cur); font-weight:800; flex:none}
 
 /* Toast */
-#toast{position:fixed; left:50%; bottom:calc(104px + min(env(safe-area-inset-bottom, 0px), 30px)); z-index:200;
+#toast{position:absolute; left:50%; bottom:calc(104px + min(env(safe-area-inset-bottom, 0px), 30px)); z-index:200;
   transform:translateX(-50%) translateY(16px); opacity:0; pointer-events:none;
   background:var(--ink); color:var(--bg); padding:11px 20px; border-radius:999px;
   font-size:14px; font-weight:700; white-space:nowrap; transition:.4s var(--spring)}
 #toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
 
 /* Konfetti */
-#fx{position:fixed; inset:0; z-index:300; pointer-events:none}
+#fx{position:absolute; inset:0; z-index:300; pointer-events:none}
 
-/* Messfühler für env(safe-area-inset-bottom) */
-#sap{position:fixed; left:-9999px; top:0; width:1px; height:env(safe-area-inset-bottom, 0px); visibility:hidden; pointer-events:none}
+/* Messfühler: Safe-Area & Viewport-Einheiten */
+#sap,.probe{position:fixed; left:-9999px; top:0; width:1px; visibility:hidden; pointer-events:none}
+#sap{height:env(safe-area-inset-bottom, 0px)}
 </style>
 </head>
 <body>
@@ -277,15 +280,18 @@ body{
   <div id="toast"></div>
   <div id="fx"></div>
   <div id="sap"></div>
+  <div id="slvh" class="probe" style="height:100lvh"></div>
+  <div id="ssvh" class="probe" style="height:100svh"></div>
+  <div id="sdvh" class="probe" style="height:100dvh"></div>
 </div>
 
 <script>
 'use strict';
 /* ================= Version & Changelog ================= */
-const APP_VERSION = 'v4';
+const APP_VERSION = 'v5';
 const CHANGES = [
-  'Tab-Leiste: überflüssiger Leerraum am unteren Bildschirmrand entfernt',
-  'Anzeige-Diagnose im Profil (Auflösung, Insets, Modus)'
+  'Workaround für iOS-26-Fehler: Tab-Leiste klebt jetzt am unteren Bildschirmrand',
+  'Erweiterte Anzeige-Diagnose im Profil'
 ];
 
 /* ================= Daten-Helfer ================= */
@@ -388,6 +394,29 @@ const DAYS_TOTAL = 90;
 function isStandalone(){
   return navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
 }
+/* iOS-26-Workaround: Standalone-Viewport wird teils ~90pt zu kurz gemeldet
+   (Apple-Issue 158055568 / WebKit #313800). Dann #app auf echte Bildschirmhöhe
+   ziehen; auf gesunden Geräten bleibt --vph ungesetzt → height:100% wie bisher. */
+function vpFix(){
+  const portrait = matchMedia('(orientation: portrait)').matches;
+  const sh = portrait ? Math.max(screen.width, screen.height) : Math.min(screen.width, screen.height);
+  const vv = window.visualViewport;
+  const sa = isStandalone();
+  const h = Math.max(innerHeight, vv ? Math.round(vv.height + vv.offsetTop) : 0, sa ? sh : 0);
+  if(sa && h - innerHeight > 40){
+    document.documentElement.style.setProperty('--vph', h + 'px');
+  }else{
+    document.documentElement.style.removeProperty('--vph');
+  }
+}
+addEventListener('resize', vpFix);
+addEventListener('orientationchange', () => setTimeout(vpFix, 300));
+if(window.visualViewport) visualViewport.addEventListener('resize', vpFix);
+/* Keyboard-Variante: visualViewport.offsetTop hängt nach Tastatur-Dismiss (FB19889436) */
+document.addEventListener('focusout', () => setTimeout(() => {
+  if(window.visualViewport && visualViewport.offsetTop !== 0) scrollTo(0, 0);
+  vpFix();
+}, 250));
 function needIHint(){
   const ios = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   return ios && !isStandalone() && !S.iHint;
@@ -642,9 +671,7 @@ function rProf(){
     '<div class="sec">App</div>' +
     '<div class="lg">' +
       '<div class="row" style="cursor:default"><div class="tx"><div class="tt">Version</div></div><div class="chev" style="font-size:15px">' + APP_VERSION + '</div></div>' +
-      '<div class="row" style="cursor:default"><div class="tx"><div class="tt">Anzeige</div></div><div class="chev" style="font-size:13px">' +
-        innerWidth + '×' + innerHeight + ' · Inset ' + (document.getElementById('sap') ? document.getElementById('sap').offsetHeight : 0) + 'px · ' +
-        (isStandalone() ? 'App' : 'Browser') + '</div></div>' +
+      '<div class="row" style="cursor:default"><div class="tx"><div class="tt">Anzeige</div><div class="td">' + diagInfo() + '</div></div></div>' +
       '<div class="row" onclick="showChanges()"><div class="tx"><div class="tt">Das ist neu</div></div><div class="chev">›</div></div>' +
       '<div class="row" onclick="checkUpdate()"><div class="tx"><div class="tt">Nach Updates suchen</div></div><div class="chev">›</div></div>' +
     '</div>' +
@@ -652,6 +679,17 @@ function rProf(){
     '<div class="sec">Daten</div>' +
     '<div class="lg"><div class="row" onclick="askReset()"><div class="tx"><div class="tt" style="color:var(--red)">Alle Daten zurücksetzen</div></div></div></div>' +
     '<div style="text-align:center;color:var(--ink3);font-size:12px;margin-top:22px">Curacon Onboarding · läuft komplett offline<br>Alle Daten bleiben auf deinem Gerät.</div>';
+}
+function diagInfo(){
+  const vv = window.visualViewport;
+  const ph = (id) => { const el = document.getElementById(id); return el ? el.offsetHeight : '–'; };
+  return 'innen ' + innerWidth + '×' + innerHeight +
+    ' · screen ' + screen.width + '×' + screen.height +
+    ' · vv ' + (vv ? Math.round(vv.height) + '+' + Math.round(vv.offsetTop) : '–') +
+    ' · lvh ' + ph('slvh') + ' · svh ' + ph('ssvh') + ' · dvh ' + ph('sdvh') +
+    ' · Inset ' + ph('sap') + ' · Gap ' + (screen.height - innerHeight) +
+    ' · ' + (isStandalone() ? 'App' : 'Browser') +
+    (document.documentElement.style.getPropertyValue('--vph') ? ' · Fix aktiv (' + document.documentElement.style.getPropertyValue('--vph') + ')' : '');
 }
 function pRow(l, v, f){
   return '<div class="row" onclick="editP(\'' + f + '\')"><div class="tx"><div class="tt">' + l + '</div></div>' +
@@ -710,7 +748,8 @@ function toast(msg){
 function confetti(){
   const NS = 'http://www.w3.org/2000/svg';
   const r = mulberry32(Date.now() % 100000);
-  const W = innerWidth, H = innerHeight;
+  const fxEl = $('#fx');
+  const W = fxEl.clientWidth || innerWidth, H = fxEl.clientHeight || innerHeight;
   const svg = document.createElementNS(NS, 'svg');
   svg.setAttribute('width', W); svg.setAttribute('height', H);
   svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
@@ -851,8 +890,9 @@ addEventListener('resize', () => {
   if($('#pg-home').classList.contains('active')) initCar();
 });
 
+vpFix();
 rHome();
-requestAnimationFrame(() => moveInd($('#tb-home')));
+requestAnimationFrame(() => { moveInd($('#tb-home')); vpFix(); });
 
 if(S.pup){
   S.pup = false; save();
