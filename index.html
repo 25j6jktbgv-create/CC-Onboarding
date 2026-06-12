@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Curacon Onboarding</title>
+<meta name="description" content="Dein Begleiter durch die ersten 90 Tage bei Curacon.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Onboarding">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#F6F3F1">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0D0D0F">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+:root{
+  --bg:#F6F3F1; --card:#FFFFFF; --card2:#EFEBE8;
+  --ink:#1C1C1E; --ink2:#6B6B70; --ink3:#A3A3A8;
+  --sep:rgba(60,60,67,.12);
+  --cur:#C62635; --cur2:#A70C15; --curSoft:rgba(198,38,53,.10);
+  --berry:#971940; --amb:#E78A03; --yel:#F5BF06;
+  --grn:#34C759; --blu:#007AFF; --pur:#AF52DE; --red:#FF3B30; --tea:#30B0C7;
+  --frost:rgba(246,243,241,.78);
+  --hero1:#D83142; --hero2:#A70C15;
+  --r-lg:22px; --r-md:16px; --r-sm:12px;
+  --spring:cubic-bezier(.34,1.56,.64,1);
+  --shadow:0 1px 2px rgba(0,0,0,.05),0 4px 14px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0D0D0F; --card:#1C1C1E; --card2:#2C2C2E;
+    --ink:#F2F2F7; --ink2:#A1A1A8; --ink3:#636368;
+    --sep:rgba(84,84,88,.46);
+    --cur:#E24956; --cur2:#C62635; --curSoft:rgba(226,73,86,.16);
+    --amb:#FF9F0A; --yel:#FFD60A;
+    --grn:#30D158; --blu:#0A84FF; --pur:#BF5AF2; --red:#FF453A; --tea:#40C8E0;
+    --frost:rgba(20,20,22,.78);
+    --hero1:#B7202F; --hero2:#7E0810;
+    --shadow:0 1px 2px rgba(0,0,0,.4);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;
+  background:var(--bg); color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-user-select:none; user-select:none;
+  overscroll-behavior:none;
+}
+#app{position:fixed; inset:0; overflow:hidden}
+
+/* ---------- Seiten ---------- */
+.pg{position:absolute; inset:0; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  padding:0 16px calc(112px + env(safe-area-inset-bottom));
+  padding-left:calc(16px + env(safe-area-inset-left));
+  padding-right:calc(16px + env(safe-area-inset-right));
+  display:none}
+.pg.active{display:block}
+.sent{height:1px}
+.hdr{position:sticky; top:0; z-index:20; margin:0 -16px;
+  padding:calc(env(safe-area-inset-top) + 14px) 16px 8px;
+  transition:background .25s,box-shadow .25s}
+.hdr.sc{background:var(--frost); -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
+  box-shadow:0 1px 0 var(--sep)}
+.hdr h1{margin:0; font-size:31px; font-weight:800; letter-spacing:-.5px}
+.hdr .sub{margin-top:2px; font-size:14px; font-weight:500; color:var(--ink2)}
+
+/* ---------- Bausteine ---------- */
+.card{background:var(--card); border-radius:var(--r-lg); padding:18px; box-shadow:var(--shadow)}
+.sec{font-size:13px; font-weight:700; color:var(--ink2); text-transform:uppercase;
+  letter-spacing:.6px; margin:26px 6px 8px; display:flex; justify-content:space-between; align-items:baseline}
+.sec small{font-weight:600; letter-spacing:0; text-transform:none; color:var(--ink3)}
+.lg{background:var(--card); border-radius:var(--r-md); overflow:hidden; box-shadow:var(--shadow)}
+.row{display:flex; align-items:center; gap:12px; padding:13px 14px; position:relative; cursor:pointer}
+.row:active{background:var(--card2)}
+.row:not(:last-child)::after{content:''; position:absolute; left:54px; right:0; bottom:0; height:1px; background:var(--sep)}
+.row.ni:not(:last-child)::after{left:14px}
+.row .tx{flex:1; min-width:0}
+.row .tt{font-size:16px; font-weight:600; line-height:1.25}
+.row .td{font-size:13px; color:var(--ink2); margin-top:2px; line-height:1.35}
+.chev{color:var(--ink3); flex:none; font-size:17px; font-weight:600}
+
+.ic{width:30px; height:30px; border-radius:9px; flex:none; display:grid; place-items:center; font-size:16px; color:#fff}
+
+/* Checkbox */
+.chk{width:26px; height:26px; border-radius:50%; border:2px solid var(--ink3); flex:none;
+  display:grid; place-items:center; transition:background .25s,border-color .25s,transform .35s var(--spring)}
+.chk svg{width:13px; height:13px; opacity:0; transform:scale(.4); transition:opacity .2s,transform .35s var(--spring)}
+.task.on .chk{background:var(--grn); border-color:var(--grn); transform:scale(1.08)}
+.task.on .chk svg{opacity:1; transform:scale(1)}
+.task.on .tt{color:var(--ink3)}
+.task.on .td{color:var(--ink3)}
+
+/* Fortschrittsbalken */
+.pb{height:6px; border-radius:3px; background:var(--card2); overflow:hidden; flex:1}
+.pb i{display:block; height:100%; border-radius:3px; background:var(--grn); transition:width .6s ease}
+
+/* Pill-Buttons */
+.btn{display:flex; align-items:center; justify-content:center; width:100%; padding:14px 22px;
+  border-radius:999px; border:none; background:var(--cur); color:#fff;
+  font:inherit; font-size:16px; font-weight:700; cursor:pointer;
+  transition:transform .35s var(--spring),opacity .2s}
+.btn:active{transform:scale(.96)}
+.btn.ghost{background:var(--curSoft); color:var(--cur)}
+.btn.danger{background:var(--red)}
+.btn.gray{background:var(--card2); color:var(--ink)}
+.btn+.btn{margin-top:10px}
+
+/* Hero */
+.hero{position:relative; overflow:hidden; border-radius:var(--r-lg); padding:20px;
+  background:linear-gradient(160deg,var(--hero1),var(--hero2)); color:#fff; box-shadow:var(--shadow)}
+.hero .deco{position:absolute; inset:0; pointer-events:none}
+.hero .in{position:relative; display:flex; align-items:center; gap:16px}
+.hero .lft{flex:1; min-width:0}
+.hero .phl{display:inline-block; font-size:12px; font-weight:700; letter-spacing:.8px; text-transform:uppercase;
+  background:rgba(255,255,255,.18); border-radius:999px; padding:4px 10px; margin-bottom:8px}
+.hero .big{font-size:44px; font-weight:800; letter-spacing:-1px; line-height:1}
+.hero .sm{font-size:14px; font-weight:500; opacity:.85; margin-top:6px}
+
+/* Ring */
+.ring{position:relative; width:96px; height:96px; flex:none}
+.ring svg{transform:rotate(-90deg)}
+.ring .num{position:absolute; inset:0; display:grid; place-items:center; font-size:20px; font-weight:800}
+
+/* Phasen-Zeile */
+.phrow{display:flex; align-items:center; gap:12px; padding:12px 14px}
+.phrow .nm{font-size:15px; font-weight:600; width:118px; flex:none}
+.phrow .ct{font-size:13px; font-weight:700; color:var(--ink2); width:34px; text-align:right; flex:none}
+.badge{font-size:10px; font-weight:800; letter-spacing:.5px; color:#fff; background:var(--cur);
+  border-radius:999px; padding:2px 7px; margin-left:6px; vertical-align:2px}
+
+/* Karussell */
+.car{overflow:hidden; margin:0 -16px; padding:0 16px}
+.cartrk{display:flex; gap:12px; touch-action:pan-y; will-change:transform}
+.tip{flex:none; background:var(--card); border-radius:var(--r-md); padding:16px; box-shadow:var(--shadow)}
+.tip .te{font-size:26px}
+.tip .th{font-size:16px; font-weight:700; margin:8px 0 4px}
+.tip .tb{font-size:14px; color:var(--ink2); line-height:1.45}
+.dots{display:flex; gap:6px; justify-content:center; margin-top:12px}
+.dots i{width:7px; height:7px; border-radius:50%; background:var(--ink3); opacity:.35; transition:.3s}
+.dots i.on{opacity:1; background:var(--cur); transform:scale(1.15)}
+
+/* Team */
+.av{width:42px; height:42px; border-radius:50%; flex:none; display:grid; place-items:center; font-size:20px; color:#fff}
+.met{width:30px; height:30px; border-radius:50%; border:2px solid var(--ink3); flex:none;
+  display:grid; place-items:center; color:transparent; font-size:14px; font-weight:800;
+  transition:background .25s,border-color .25s,transform .35s var(--spring)}
+.trow.on .met{background:var(--blu); border-color:var(--blu); color:#fff; transform:scale(1.08)}
+.edit{flex:none; width:30px; height:30px; border-radius:50%; border:none; background:var(--card2);
+  color:var(--ink2); font-size:14px; display:grid; place-items:center; cursor:pointer}
+
+/* FAQ */
+.fq .a{max-height:0; overflow:hidden; transition:max-height .35s ease; font-size:14px; color:var(--ink2); line-height:1.5}
+.fq.open .a{max-height:240px}
+.fq .ar{transition:transform .3s var(--spring); color:var(--ink3); flex:none}
+.fq.open .ar{transform:rotate(90deg)}
+
+/* Statistik */
+.stats{display:flex; text-align:center}
+.stats>div{flex:1}
+.stats .v{font-size:26px; font-weight:800}
+.stats .l{font-size:12px; color:var(--ink2); font-weight:600; margin-top:2px}
+.stats>div:not(:last-child){border-right:1px solid var(--sep)}
+
+/* ---------- Tab-Leiste ---------- */
+#tabbar{position:fixed; left:0; right:0; bottom:0; z-index:50; display:flex;
+  padding:6px 10px calc(env(safe-area-inset-bottom) + 4px);
+  background:var(--frost); -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
+  border-top:1px solid var(--sep)}
+#tind{position:absolute; top:7px; left:0; width:58px; height:32px; border-radius:999px;
+  background:var(--curSoft); transition:transform .5s var(--spring)}
+.tb{flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:7px 0 3px;
+  background:none; border:none; font:inherit; font-size:10px; font-weight:600; color:var(--ink3);
+  cursor:pointer; position:relative; z-index:1; transition:color .25s}
+.tb svg{width:24px; height:24px}
+.tb.on{color:var(--cur)}
+
+/* ---------- Overlay / Sheets ---------- */
+#ovl{position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center;
+  padding:24px; background:rgba(0,0,0,.45); -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px)}
+#ovl.show{display:flex}
+.sheet{background:var(--card); border-radius:26px; padding:24px; width:100%; max-width:400px;
+  max-height:80vh; overflow-y:auto; animation:pop .5s var(--spring)}
+@keyframes pop{from{transform:scale(.86) translateY(24px); opacity:0}}
+.sheet h2{margin:0 0 6px; font-size:22px; font-weight:800; letter-spacing:-.3px}
+.sheet .p{font-size:15px; color:var(--ink2); line-height:1.45; margin:0 0 16px}
+.sheet .lbl{font-size:13px; font-weight:700; color:var(--ink2); margin:14px 2px 6px}
+.inp{width:100%; padding:13px 14px; border-radius:12px; border:1px solid var(--sep);
+  background:var(--card2); color:var(--ink); font:inherit; font-size:16px; outline:none;
+  -webkit-user-select:text; user-select:text}
+.inp:focus{border-color:var(--cur)}
+.chlist{margin:0 0 18px; padding-left:0; list-style:none}
+.chlist li{display:flex; gap:10px; font-size:15px; line-height:1.4; padding:5px 0}
+.chlist li::before{content:'✦'; color:var(--cur); font-weight:800; flex:none}
+
+/* Toast */
+#toast{position:fixed; left:50%; bottom:calc(104px + env(safe-area-inset-bottom)); z-index:200;
+  transform:translateX(-50%) translateY(16px); opacity:0; pointer-events:none;
+  background:var(--ink); color:var(--bg); padding:11px 20px; border-radius:999px;
+  font-size:14px; font-weight:700; white-space:nowrap; transition:.4s var(--spring)}
+#toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+
+/* Konfetti */
+#fx{position:fixed; inset:0; z-index:300; pointer-events:none}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="pg active" id="pg-home">
+    <div class="sent"></div>
+    <header class="hdr"><h1 id="hiTitle">Hallo!</h1><div class="sub" id="hiSub"></div></header>
+    <div id="c-home"></div>
+  </div>
+
+  <div class="pg" id="pg-tasks">
+    <div class="sent"></div>
+    <header class="hdr"><h1>Aufgaben</h1><div class="sub">Deine Checkliste für die ersten 90 Tage</div></header>
+    <div id="c-tasks"></div>
+  </div>
+
+  <div class="pg" id="pg-team">
+    <div class="sent"></div>
+    <header class="hdr"><h1>Dein Team</h1><div class="sub">Wichtige Menschen – tippe, wen du schon kennst</div></header>
+    <div id="c-team"></div>
+  </div>
+
+  <div class="pg" id="pg-know">
+    <div class="sent"></div>
+    <header class="hdr"><h1>Wissen</h1><div class="sub">Antworten, Begriffe & Anlaufstellen</div></header>
+    <div id="c-know"></div>
+  </div>
+
+  <div class="pg" id="pg-prof">
+    <div class="sent"></div>
+    <header class="hdr"><h1>Profil</h1><div class="sub">Deine Daten & App-Infos</div></header>
+    <div id="c-prof"></div>
+  </div>
+
+  <nav id="tabbar">
+    <div id="tind"></div>
+    <button class="tb on" id="tb-home" onclick="goP('home',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.3 2.6a1 1 0 0 1 1.4 0l8 7.5c.2.2.3.5.3.7V20a2 2 0 0 1-2 2h-4a1 1 0 0 1-1-1v-5h-4v5a1 1 0 0 1-1 1H5a2 2 0 0 1-2-2v-9.2c0-.2.1-.5.3-.7l8-7.5z"/></svg>
+      Start</button>
+    <button class="tb" id="tb-tasks" onclick="goP('tasks',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7.6 4.2 5.7 6.1 4.9 5.3a1 1 0 0 0-1.4 1.4l1.5 1.5a1 1 0 0 0 1.4 0L9 5.6A1 1 0 1 0 7.6 4.2zM12 6a1 1 0 0 0 0 2h7a1 1 0 1 0 0-2h-7zM7.6 10.7 5.7 12.6l-.8-.8a1 1 0 0 0-1.4 1.4L5 14.7a1 1 0 0 0 1.4 0L9 12.1a1 1 0 1 0-1.4-1.4zM12 12.5a1 1 0 0 0 0 2h7a1 1 0 1 0 0-2h-7zM7.6 17.2l-1.9 1.9-.8-.8a1 1 0 0 0-1.4 1.4l1.5 1.5a1 1 0 0 0 1.4 0L9 18.6a1 1 0 1 0-1.4-1.4zM12 19a1 1 0 0 0 0 2h7a1 1 0 1 0 0-2h-7z"/></svg>
+      Aufgaben</button>
+    <button class="tb" id="tb-team" onclick="goP('team',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-3.3 0-7 1.7-7 4v2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2c0-2.3-3.7-4-7-4zm8-2.3a3.5 3.5 0 0 0 0-6.9 5.9 5.9 0 0 1 0 6.9zm1.6 2.8c1.9.8 3.4 2 3.4 3.5v2a1 1 0 0 1-1 1h-3v-2c0-1.8-.9-3.3-2.3-4.4 1 .1 2 .4 2.9.9z"/></svg>
+      Team</button>
+    <button class="tb" id="tb-know" onclick="goP('know',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.5 2A3.5 3.5 0 0 0 3 5.5v13A3.5 3.5 0 0 0 6.5 22H20a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H6.5zM5 18.5c0-.8.7-1.5 1.5-1.5H19v3H6.5A1.5 1.5 0 0 1 5 18.5zM8 7a1 1 0 0 1 1-1h7a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1zm1 3a1 1 0 1 0 0 2h5a1 1 0 1 0 0-2H9z"/></svg>
+      Wissen</button>
+    <button class="tb" id="tb-prof" onclick="goP('prof',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 5a3.2 3.2 0 1 1 0 6.4A3.2 3.2 0 0 1 12 7zm0 13a8 8 0 0 1-5.6-2.3c.4-1.8 2.9-2.9 5.6-2.9s5.2 1.1 5.6 2.9A8 8 0 0 1 12 20z"/></svg>
+      Profil</button>
+  </nav>
+
+  <div id="ovl"></div>
+  <div id="toast"></div>
+  <div id="fx"></div>
+</div>
+
+<script>
+'use strict';
+/* ================= Version & Changelog ================= */
+const APP_VERSION = 'v1';
+const CHANGES = [
+  'Aufgaben-Checkliste für deine ersten 90 Tage',
+  'Persönlicher Fortschritt mit Tageszähler',
+  'Team-Kontakte zum Kennenlernen & Abhaken',
+  'FAQ, Glossar und Tipps für den Start'
+];
+
+/* ================= Daten-Helfer ================= */
+const DB = 'curacon-onb';
+function ld(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
+function sv(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+
+function defState(){
+  return { v:1, setup:false, pup:false,
+    profile:{ name:'', start:todayISO(), ort:'' },
+    done:{}, met:{}, names:{} };
+}
+let S = Object.assign(defState(), ld(DB, {}));
+function save(){ sv(DB, S); }
+
+/* ================= Utilities ================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function todayISO(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function dayNum(){
+  const t = new Date(todayISO()+'T00:00:00');
+  const s = new Date((S.profile.start || todayISO())+'T00:00:00');
+  return Math.floor((t - s) / 864e5) + 1;
+}
+function fmtDate(iso){
+  if(!iso) return '–';
+  const d = new Date(iso+'T00:00:00');
+  return d.toLocaleDateString('de-DE', {day:'numeric', month:'long', year:'numeric'});
+}
+function firstName(){ return (S.profile.name || '').trim().split(/\s+/)[0] || ''; }
+
+/* ================= Statischer Katalog ================= */
+const PHASES = [
+  { id:'p0', name:'Vor Tag 1',    col:'var(--amb)' },
+  { id:'p1', name:'Erste Woche',  col:'var(--cur)' },
+  { id:'p2', name:'Erster Monat', col:'var(--blu)' },
+  { id:'p3', name:'Monat 2–3',   col:'var(--grn)' }
+];
+const TASKS = [
+  { id:'t01', p:'p0', t:'Vertragsunterlagen zurücksenden', d:'Unterschrieben an HR – digital oder per Post.' },
+  { id:'t02', p:'p0', t:'Persönliche Daten an HR melden', d:'Bankverbindung, Steuer-ID, Krankenkasse.' },
+  { id:'t03', p:'p0', t:'Willkommens-E-Mail lesen', d:'Treffpunkt & Ablauf für deinen ersten Tag.' },
+  { id:'t04', p:'p0', t:'Anfahrt planen', d:'Parken, ÖPNV oder Rad – Puffer einplanen.' },
+  { id:'t05', p:'p1', t:'Laptop & Zugänge bei der IT abholen', d:'Passwörter ändern, MFA einrichten.' },
+  { id:'t06', p:'p1', t:'E-Mail-Signatur einrichten', d:'Nach Curacon-Vorlage aus dem Intranet.' },
+  { id:'t07', p:'p1', t:'Zeiterfassung kennenlernen', d:'Den ersten Arbeitstag direkt buchen.' },
+  { id:'t08', p:'p1', t:'Standort-Rundgang machen', d:'Küche, Drucker, Meetingräume, Notausgänge.' },
+  { id:'t09', p:'p1', t:'Kennenlern-Termin mit Buddy', d:'30 Minuten – Fragen vorab sammeln lohnt sich.' },
+  { id:'t10', p:'p1', t:'Dich im Team vorstellen', d:'Wer bist du, was machst du, was magst du?' },
+  { id:'t11', p:'p2', t:'Pflicht-E-Learnings abschließen', d:'Datenschutz, IT-Sicherheit, Compliance.' },
+  { id:'t12', p:'p2', t:'Interne Tools kennenlernen', d:'Intranet, DMS, Wissensspeicher, Vorlagen.' },
+  { id:'t13', p:'p2', t:'Erstes Feedbackgespräch führen', d:'Mit deiner Führungskraft Eindrücke teilen.' },
+  { id:'t14', p:'p2', t:'Erste Aufgabe im Mandat/Projekt', d:'Klein anfangen – Fragen stellen ist erwünscht.' },
+  { id:'t15', p:'p2', t:'Mittagessen mit dem Team', d:'Der schnellste Weg, wirklich anzukommen.' },
+  { id:'t16', p:'p3', t:'Zwischenfazit mit Führungskraft', d:'Was läuft gut, wo brauchst du Unterstützung?' },
+  { id:'t17', p:'p3', t:'Entwicklungsziel festlegen', d:'Ein konkretes Ziel für die nächsten Monate.' },
+  { id:'t18', p:'p3', t:'Zwei andere Teams kennenlernen', d:'Je ein Kaffee mit Kolleg:innen anderer Bereiche.' },
+  { id:'t19', p:'p3', t:'Onboarding-Feedback an HR geben', d:'Dein Blick hilft den Nächsten nach dir.' }
+];
+const CONTACTS = [
+  { id:'c1', role:'Buddy', hint:'Erste Anlaufstelle für alle Alltagsfragen', ic:'🤝', col:'var(--blu)' },
+  { id:'c2', role:'Führungskraft', hint:'Ziele, Feedback, Entwicklung', ic:'🧭', col:'var(--cur)' },
+  { id:'c3', role:'HR / People', hint:'Vertrag, Urlaub, Krankmeldung', ic:'📋', col:'var(--pur)' },
+  { id:'c4', role:'IT-Support', hint:'Hardware, Zugänge, Helpdesk', ic:'💻', col:'var(--grn)' },
+  { id:'c5', role:'Office-Management', hint:'Schlüssel, Post, Räume', ic:'🔑', col:'var(--amb)' },
+  { id:'c6', role:'Fachliche:r Mentor:in', hint:'Einarbeitung in deinem Bereich', ic:'🎓', col:'var(--tea)' }
+];
+const FAQ = [
+  { q:'Wie funktioniert die Zeiterfassung?', a:'Arbeitszeiten erfasst du täglich im Zeiterfassungssystem (Link im Intranet). Dein Buddy zeigt dir die ersten Buchungen – danach ist es Routine.' },
+  { q:'Wen informiere ich bei Krankheit?', a:'Vor Arbeitsbeginn kurz Führungskraft und Team informieren. Die Krankmeldung (AU) reichst du gemäß Regelung über das HR-Portal ein.' },
+  { q:'Wie beantrage ich Urlaub?', a:'Im HR-Portal beantragen, deine Führungskraft gibt frei. Früh planen – besonders in der Prüfungssaison.' },
+  { q:'Gibt es mobiles Arbeiten?', a:'Ja, nach Absprache mit dem Team. Die Details regelt die interne Vereinbarung – sprich es im ersten Jour fixe an.' },
+  { q:'Was ziehe ich an?', a:'Im Büro Business Casual, bei Mandantenterminen Business. Im Zweifel: einfach das Team fragen.' },
+  { q:'Wie reiche ich Reisekosten ein?', a:'Belege sammeln und über das Reisekostentool einreichen. Vorlagen und Pauschalen findest du im Intranet.' },
+  { q:'Wann kommt das Gehalt?', a:'Zum Monatsende. Deine Abrechnung findest du digital im HR-Portal.' },
+  { q:'Wie lange dauert die Probezeit?', a:'In der Regel sechs Monate – mit Feedbackgesprächen zur Halbzeit und zum Ende. Die App erinnert dich in Phase „Monat 2–3" daran.' }
+];
+const GLOSSAR = [
+  { t:'WP', d:'Wirtschaftsprüfung – Prüfung von Jahresabschlüssen, das Kerngeschäft von Curacon.' },
+  { t:'StB', d:'Steuerberatung – zweiter großer Geschäftsbereich.' },
+  { t:'UB', d:'Unternehmensberatung – Beratung für Gesundheits- und Sozialwirtschaft.' },
+  { t:'Mandat / Mandant:in', d:'Auftrag bzw. Kund:in – z. B. Krankenhaus, Pflegeeinrichtung, kirchlicher Träger.' },
+  { t:'Busy Season', d:'Prüfungssaison ca. Januar bis Mai – die intensivste Zeit im Jahr.' },
+  { t:'JA', d:'Jahresabschluss – Bilanz, GuV und Anhang eines Mandanten.' },
+  { t:'DMS', d:'Dokumentenmanagementsystem – hier liegen Arbeitspapiere und Akten.' },
+  { t:'Jour fixe', d:'Regelmäßiger Teamtermin für Abstimmung und Neuigkeiten.' }
+];
+const TIPS = [
+  { e:'💬', h:'Fragen ist Stärke', b:'Niemand erwartet, dass du alles weißt. Jede Frage in Woche 1 spart dir zehn in Monat 3.' },
+  { e:'📓', h:'Notizbuch führen', b:'Namen, Abkürzungen, Aha-Momente: aufschreiben. Nach zwei Wochen ist es dein wertvollstes Dokument.' },
+  { e:'☕️', h:'Kaffee-Dates machen', b:'Ein kurzes Kennenlernen pro Woche reicht – dein Netzwerk trägt dich durchs ganze erste Jahr.' },
+  { e:'🌿', h:'Pausen sind Pflicht', b:'Onboarding ist ein Marathon. Mittagspause weg vom Schreibtisch, Feierabend ist Feierabend.' },
+  { e:'🎯', h:'Feedback aktiv holen', b:'Warte nicht aufs offizielle Gespräch. Ein kurzes „Passt das so?" nach der ersten Aufgabe wirkt Wunder.' },
+  { e:'🏥', h:'Unsere Welt kennenlernen', b:'Curacon berät Gesundheits- und Sozialwirtschaft. Ein Blick in den Wissensspeicher lohnt sich.' }
+];
+const DAYS_TOTAL = 90;
+
+/* ================= Abgeleitete Werte ================= */
+function phaseFor(day){ if(day < 1) return 'p0'; if(day <= 7) return 'p1'; if(day <= 30) return 'p2'; return 'p3'; }
+function phaseStats(pid){
+  const ts = TASKS.filter(t => t.p === pid);
+  return { done: ts.filter(t => S.done[t.id]).length, total: ts.length };
+}
+function totalStats(){
+  return { done: TASKS.filter(t => S.done[t.id]).length, total: TASKS.length };
+}
+
+/* ================= Navigation ================= */
+const RENDERS = { home:rHome, tasks:rTasks, team:rTeam, know:rKnow, prof:rProf };
+function goP(id, btn){
+  document.querySelectorAll('.pg').forEach(p => p.classList.toggle('active', p.id === 'pg-'+id));
+  document.querySelectorAll('.tb').forEach(b => b.classList.toggle('on', b === btn));
+  moveInd(btn);
+  RENDERS[id] && RENDERS[id]();
+}
+function moveInd(btn){
+  const ind = $('#tind');
+  const r = btn.getBoundingClientRect(), p = btn.parentElement.getBoundingClientRect();
+  ind.style.transform = 'translateX(' + (r.left - p.left + (r.width - 58) / 2) + 'px)';
+}
+
+/* ================= Render: Start ================= */
+function rHome(){
+  const day = dayNum(), st = totalStats();
+  const pct = st.total ? Math.round(st.done / st.total * 100) : 0;
+  const ph = PHASES.find(p => p.id === phaseFor(day));
+  const h = new Date().getHours();
+  const greet = h < 11 ? 'Guten Morgen' : h < 18 ? 'Hallo' : 'Guten Abend';
+  $('#hiTitle').textContent = greet + (firstName() ? ', ' + firstName() : '') + '!';
+  $('#hiSub').textContent = day < 1 ? 'Bald geht es los 🎉' : 'Schön, dass du an Bord bist.';
+
+  const big = day < 1 ? (1 - day) : day;
+  const lbl = day < 1 ? (1 - day === 1 ? 'Tag bis zum Start' : 'Tage bis zum Start') : 'von ' + DAYS_TOTAL + ' Onboarding-Tagen';
+  const C = 2 * Math.PI * 40;
+  $('#c-home').innerHTML =
+    '<div class="hero">' + heroDeco() +
+      '<div class="in"><div class="lft">' +
+        '<span class="phl">' + esc(ph.name) + '</span>' +
+        '<div class="big">' + (day < 1 ? 'Noch ' + big : 'Tag ' + big) + '</div>' +
+        '<div class="sm">' + lbl + '</div>' +
+      '</div>' +
+      '<div class="ring"><svg width="96" height="96" viewBox="0 0 96 96">' +
+        '<circle cx="48" cy="48" r="40" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="9"/>' +
+        '<circle id="ringArc" cx="48" cy="48" r="40" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" ' +
+          'stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + (C * (1 - pct/100)).toFixed(1) + '" ' +
+          'style="transition:stroke-dashoffset .8s ease"/>' +
+      '</svg><div class="num" id="ringTxt">' + pct + '%</div></div></div>' +
+    '</div>' +
+
+    '<div class="sec">Als Nächstes<small id="nxCount"></small></div>' +
+    '<div id="nextWrap"></div>' +
+
+    '<div class="sec">Dein Fortschritt</div>' +
+    '<div class="lg">' + PHASES.map(p => {
+      const s = phaseStats(p.id);
+      const now = p.id === phaseFor(day) ? '<span class="badge">JETZT</span>' : '';
+      return '<div class="phrow" onclick="goP(\'tasks\', document.getElementById(\'tb-tasks\'))">' +
+        '<div class="nm">' + esc(p.name) + now + '</div>' +
+        '<div class="pb"><i id="pbH-' + p.id + '" style="background:' + p.col + ';width:' + (s.total ? s.done/s.total*100 : 0) + '%"></i></div>' +
+        '<div class="ct" id="pcH-' + p.id + '">' + s.done + '/' + s.total + '</div></div>';
+    }).join('') + '</div>' +
+
+    '<div class="sec">Tipps für den Start</div>' +
+    '<div class="car"><div class="cartrk" id="carTrk">' + TIPS.map(t =>
+      '<div class="tip"><div class="te">' + t.e + '</div><div class="th">' + esc(t.h) + '</div><div class="tb">' + esc(t.b) + '</div></div>'
+    ).join('') + '</div><div class="dots" id="carDots">' + TIPS.map((t, i) =>
+      '<i class="' + (i === 0 ? 'on' : '') + '"></i>').join('') + '</div></div>';
+
+  rNext();
+  initCar();
+}
+
+function rNext(){
+  const open = TASKS.filter(t => !S.done[t.id]).slice(0, 3);
+  const wrap = $('#nextWrap'); if(!wrap) return;
+  const cnt = $('#nxCount');
+  if(cnt) cnt.textContent = open.length ? totalStats().total - totalStats().done + ' offen' : '';
+  wrap.innerHTML = open.length
+    ? '<div class="lg">' + open.map(taskRow).join('') + '</div>'
+    : '<div class="card" style="text-align:center"><div style="font-size:34px">🏆</div>' +
+      '<div style="font-weight:800;font-size:17px;margin-top:6px">Alles erledigt!</div>' +
+      '<div style="font-size:14px;color:var(--ink2);margin-top:4px">Du hast dein komplettes Onboarding abgeschlossen. Stark!</div></div>';
+}
+
+function heroDeco(){
+  const r = mulberry32(42);
+  const cols = ['#F5BF06', '#E78A03', '#FFFFFF', '#971940'];
+  let s = '<svg class="deco" viewBox="0 0 400 160" preserveAspectRatio="xMidYMid slice">';
+  for(let i = 0; i < 9; i++){
+    const o = (0.07 + r() * 0.13).toFixed(2);
+    s += '<circle cx="' + (r()*400).toFixed(0) + '" cy="' + (r()*160).toFixed(0) + '" r="' + (10 + r()*38).toFixed(0) + '" ' +
+      'fill="' + cols[Math.floor(r()*cols.length)] + '" opacity="' + o + '">' +
+      '<animate attributeName="opacity" values="' + o + ';' + (o*1.9).toFixed(2) + ';' + o + '" dur="' + (4 + r()*4).toFixed(1) + 's" repeatCount="indefinite"/></circle>';
+  }
+  return s + '</svg>';
+}
+
+/* ================= Render: Aufgaben ================= */
+function rTasks(){
+  const day = dayNum(), cur = phaseFor(day);
+  $('#c-tasks').innerHTML = PHASES.map(p => {
+    const s = phaseStats(p.id);
+    const now = p.id === cur ? '<span class="badge">JETZT</span>' : '';
+    return '<div class="sec">' + esc(p.name) + now + '<small id="pcT-' + p.id + '">' + s.done + '/' + s.total + '</small></div>' +
+      '<div style="margin:0 6px 8px"><div class="pb"><i id="pbT-' + p.id + '" style="background:' + p.col + ';width:' + (s.total ? s.done/s.total*100 : 0) + '%"></i></div></div>' +
+      '<div class="lg">' + TASKS.filter(t => t.p === p.id).map(taskRow).join('') + '</div>';
+  }).join('');
+}
+
+function taskRow(t){
+  const on = S.done[t.id] ? ' on' : '';
+  return '<div class="row task' + on + '" data-t="' + t.id + '" onclick="tgT(\'' + t.id + '\',this)">' +
+    '<div class="chk"><svg viewBox="0 0 14 14"><path d="M2 7.5 5.5 11 12 3.5" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
+    '<div class="tx"><div class="tt">' + esc(t.t) + '</div><div class="td">' + esc(t.d) + '</div></div></div>';
+}
+
+/* Hot-Path: Checkbox togglen ohne Full-Render */
+function tgT(id, el){
+  const task = TASKS.find(t => t.id === id); if(!task) return;
+  const before = phaseStats(task.p);
+  if(S.done[id]) delete S.done[id]; else S.done[id] = Date.now();
+  save();
+  document.querySelectorAll('[data-t="' + id + '"]').forEach(n => n.classList.toggle('on', !!S.done[id]));
+  updateCounts();
+  const after = phaseStats(task.p);
+  if(after.done === after.total && before.done !== before.total){
+    confetti();
+    const ts = totalStats();
+    toast(ts.done === ts.total ? 'Onboarding komplett! 🏆' : 'Phase „' + PHASES.find(p => p.id === task.p).name + '" geschafft! 🎉');
+  }
+  if($('#pg-home').classList.contains('active')) setTimeout(rNext, 450);
+}
+
+function updateCounts(){
+  const st = totalStats();
+  const pct = st.total ? Math.round(st.done / st.total * 100) : 0;
+  const arc = $('#ringArc');
+  if(arc){ const C = 2 * Math.PI * 40; arc.style.strokeDashoffset = (C * (1 - pct/100)).toFixed(1); }
+  const rt = $('#ringTxt'); if(rt) rt.textContent = pct + '%';
+  PHASES.forEach(p => {
+    const s = phaseStats(p.id), w = (s.total ? s.done/s.total*100 : 0) + '%', c = s.done + '/' + s.total;
+    ['H','T'].forEach(k => {
+      const bar = document.getElementById('pb' + k + '-' + p.id); if(bar) bar.style.width = w;
+      const ct = document.getElementById('pc' + k + '-' + p.id); if(ct) ct.textContent = c;
+    });
+  });
+  const sd = $('#stDone'); if(sd) sd.textContent = st.done;
+}
+
+/* ================= Render: Team ================= */
+function rTeam(){
+  const met = Object.keys(S.met).length;
+  $('#c-team').innerHTML =
+    '<div class="sec">Kennenlernen<small>' + met + '/' + CONTACTS.length + ' getroffen</small></div>' +
+    '<div class="lg">' + CONTACTS.map(c => {
+      const on = S.met[c.id] ? ' on' : '';
+      const nm = S.names[c.id];
+      return '<div class="row trow' + on + '" onclick="tgM(\'' + c.id + '\',this)">' +
+        '<div class="av" style="background:' + c.col + '">' + c.ic + '</div>' +
+        '<div class="tx"><div class="tt">' + esc(c.role) + (nm ? ' · ' + esc(nm) : '') + '</div>' +
+        '<div class="td">' + (nm ? esc(c.hint) : esc(c.hint) + ' – Name eintragen ✎') + '</div></div>' +
+        '<button class="edit" onclick="event.stopPropagation();editC(\'' + c.id + '\')">✎</button>' +
+        '<div class="met">✓</div></div>';
+    }).join('') + '</div>' +
+    '<div class="card" style="margin-top:16px;font-size:14px;color:var(--ink2);line-height:1.5">💡 Tipp: Frag deinen Buddy nach den Namen – und hak ab, wen du schon getroffen hast. Mit ✎ trägst du Namen ein.</div>';
+}
+function tgM(id, el){
+  if(S.met[id]) delete S.met[id]; else S.met[id] = Date.now();
+  save();
+  el.classList.toggle('on', !!S.met[id]);
+  const sec = $('#c-team .sec small');
+  if(sec) sec.textContent = Object.keys(S.met).length + '/' + CONTACTS.length + ' getroffen';
+  if(Object.keys(S.met).length === CONTACTS.length) confetti();
+}
+function editC(id){
+  const c = CONTACTS.find(x => x.id === id);
+  pop('<h2>' + esc(c.role) + '</h2><p class="p">Wie heißt deine Ansprechperson?</p>' +
+    '<input class="inp" id="shInp" placeholder="Name" value="' + esc(S.names[id] || '') + '">' +
+    '<div style="margin-top:18px"><button class="btn" onclick="saveC(\'' + id + '\')">Speichern</button>' +
+    '<button class="btn gray" onclick="closePop()">Abbrechen</button></div>');
+  setTimeout(() => { const i = $('#shInp'); i && i.focus(); }, 80);
+}
+function saveC(id){
+  const v = ($('#shInp').value || '').trim();
+  if(v) S.names[id] = v; else delete S.names[id];
+  save(); closePop(); rTeam();
+}
+
+/* ================= Render: Wissen ================= */
+function rKnow(){
+  $('#c-know').innerHTML =
+    '<div class="sec">Häufige Fragen</div>' +
+    '<div class="lg">' + FAQ.map((f, i) =>
+      '<div class="row fq ni" onclick="this.classList.toggle(\'open\')" style="flex-direction:column;align-items:stretch">' +
+        '<div style="display:flex;align-items:center;gap:10px"><div class="tx"><div class="tt">' + esc(f.q) + '</div></div><div class="ar">›</div></div>' +
+        '<div class="a"><div style="padding-top:8px">' + esc(f.a) + '</div></div></div>'
+    ).join('') + '</div>' +
+
+    '<div class="sec">Glossar</div>' +
+    '<div class="lg">' + GLOSSAR.map(g =>
+      '<div class="row ni" style="cursor:default"><div class="tx"><div class="tt">' + esc(g.t) + '</div><div class="td">' + esc(g.d) + '</div></div></div>'
+    ).join('') + '</div>' +
+
+    '<div class="sec">Anlaufstellen</div>' +
+    '<div class="lg">' +
+      kRow('🌐', 'var(--blu)', 'Intranet', 'Neuigkeiten, Vorlagen, Schnellzugriffe') +
+      kRow('🧑‍💼', 'var(--pur)', 'HR-Portal', 'Urlaub, Abrechnung, persönliche Daten') +
+      kRow('⏱', 'var(--amb)', 'Zeiterfassung', 'Tägliche Buchungen & Übersichten') +
+      kRow('🛟', 'var(--grn)', 'IT-Helpdesk', 'Ticket stellen oder anrufen bei Technikfragen') +
+      kRow('📚', 'var(--tea)', 'Wissensspeicher', 'Fachwissen zur Gesundheits- & Sozialwirtschaft') +
+    '</div>' +
+    '<div class="card" style="margin-top:16px;font-size:14px;color:var(--ink2);line-height:1.5">Die Links zu diesen Systemen findest du im Intranet unter „Schnellzugriffe" – am besten gleich als Favoriten speichern.</div>';
+}
+function kRow(e, col, t, d){
+  return '<div class="row" style="cursor:default"><div class="ic" style="background:' + col + '">' + e + '</div>' +
+    '<div class="tx"><div class="tt">' + t + '</div><div class="td">' + d + '</div></div></div>';
+}
+
+/* ================= Render: Profil ================= */
+function rProf(){
+  const day = dayNum(), st = totalStats();
+  $('#c-prof').innerHTML =
+    '<div class="card stats" style="margin-top:14px">' +
+      '<div><div class="v">' + (day < 1 ? '–' : day) + '</div><div class="l">Tag</div></div>' +
+      '<div><div class="v" id="stDone">' + st.done + '</div><div class="l">Aufgaben ✓</div></div>' +
+      '<div><div class="v">' + Object.keys(S.met).length + '</div><div class="l">Kontakte</div></div>' +
+    '</div>' +
+
+    '<div class="sec">Deine Daten</div>' +
+    '<div class="lg">' +
+      pRow('Name', S.profile.name || 'Eintragen', 'name') +
+      pRow('Erster Arbeitstag', fmtDate(S.profile.start), 'start') +
+      pRow('Standort', S.profile.ort || 'Eintragen', 'ort') +
+    '</div>' +
+
+    '<div class="sec">App</div>' +
+    '<div class="lg">' +
+      '<div class="row" style="cursor:default"><div class="tx"><div class="tt">Version</div></div><div class="chev" style="font-size:15px">' + APP_VERSION + '</div></div>' +
+      '<div class="row" onclick="showChanges()"><div class="tx"><div class="tt">Das ist neu</div></div><div class="chev">›</div></div>' +
+      '<div class="row" onclick="checkUpdate()"><div class="tx"><div class="tt">Nach Updates suchen</div></div><div class="chev">›</div></div>' +
+    '</div>' +
+
+    '<div class="sec">Daten</div>' +
+    '<div class="lg"><div class="row" onclick="askReset()"><div class="tx"><div class="tt" style="color:var(--red)">Alle Daten zurücksetzen</div></div></div></div>' +
+    '<div style="text-align:center;color:var(--ink3);font-size:12px;margin-top:22px">Curacon Onboarding · läuft komplett offline<br>Alle Daten bleiben auf deinem Gerät.</div>';
+}
+function pRow(l, v, f){
+  return '<div class="row" onclick="editP(\'' + f + '\')"><div class="tx"><div class="tt">' + l + '</div></div>' +
+    '<div style="font-size:15px;color:var(--ink2);max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(v) + '</div><div class="chev">›</div></div>';
+}
+function editP(f){
+  const cfg = {
+    name: { h:'Dein Name', t:'text', ph:'Vor- und Nachname' },
+    start:{ h:'Erster Arbeitstag', t:'date', ph:'' },
+    ort:  { h:'Dein Standort', t:'text', ph:'z. B. Münster' }
+  }[f];
+  pop('<h2>' + cfg.h + '</h2>' +
+    '<input class="inp" id="shInp" type="' + cfg.t + '" placeholder="' + cfg.ph + '" value="' + esc(S.profile[f] || '') + '">' +
+    '<div style="margin-top:18px"><button class="btn" onclick="saveP(\'' + f + '\')">Speichern</button>' +
+    '<button class="btn gray" onclick="closePop()">Abbrechen</button></div>');
+}
+function saveP(f){
+  const v = ($('#shInp').value || '').trim();
+  S.profile[f] = v; save(); closePop(); rProf();
+}
+function askReset(){
+  pop('<h2>Alles zurücksetzen?</h2><p class="p">Fortschritt, Kontakte und Profil werden endgültig gelöscht. Das kann nicht rückgängig gemacht werden.</p>' +
+    '<button class="btn danger" onclick="doReset()">Ja, alles löschen</button>' +
+    '<button class="btn gray" onclick="closePop()">Abbrechen</button>');
+}
+function doReset(){
+  try{ localStorage.removeItem(DB); }catch(e){}
+  location.reload();
+}
+function showChanges(){
+  pop('<h2>Das ist neu in ' + APP_VERSION + '</h2><ul class="chlist">' +
+    CHANGES.map(c => '<li>' + esc(c) + '</li>').join('') + '</ul>' +
+    '<button class="btn" onclick="closePop()">Alles klar</button>');
+}
+
+/* ================= Popups & Toast ================= */
+let ovlDismiss = true;
+function pop(html, opts){
+  ovlDismiss = !opts || opts.dismiss !== false;
+  const o = $('#ovl');
+  o.innerHTML = '<div class="sheet">' + html + '</div>';
+  o.classList.add('show');
+}
+function closePop(){ const o = $('#ovl'); o.classList.remove('show'); o.innerHTML = ''; }
+$('#ovl').addEventListener('click', e => { if(e.target.id === 'ovl' && ovlDismiss) closePop(); });
+
+let toastT;
+function toast(msg){
+  const t = $('#toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT);
+  toastT = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+/* ================= Konfetti (SMIL, seeded) ================= */
+function confetti(){
+  const NS = 'http://www.w3.org/2000/svg';
+  const r = mulberry32(Date.now() % 100000);
+  const W = innerWidth, H = innerHeight;
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('width', W); svg.setAttribute('height', H);
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  const cols = ['#C62635', '#E78A03', '#F5BF06', '#971940', '#34C759', '#007AFF'];
+  for(let i = 0; i < 38; i++){
+    const g = document.createElementNS(NS, 'g');
+    const x = r() * W, dly = (r() * 0.35).toFixed(2), dur = (0.9 + r() * 0.9).toFixed(2);
+    const rect = document.createElementNS(NS, 'rect');
+    rect.setAttribute('x', -4); rect.setAttribute('y', -7);
+    rect.setAttribute('width', 8); rect.setAttribute('height', 14);
+    rect.setAttribute('rx', 2);
+    rect.setAttribute('fill', cols[Math.floor(r() * cols.length)]);
+    rect.setAttribute('transform', 'rotate(' + Math.floor(r() * 360) + ')');
+    const tr = document.createElementNS(NS, 'animateTransform');
+    tr.setAttribute('attributeName', 'transform'); tr.setAttribute('type', 'translate');
+    tr.setAttribute('from', x + ' -20'); tr.setAttribute('to', (x + (r() - 0.5) * 160) + ' ' + (H + 30));
+    tr.setAttribute('dur', dur + 's'); tr.setAttribute('begin', dly + 's'); tr.setAttribute('fill', 'freeze');
+    const op = document.createElementNS(NS, 'animate');
+    op.setAttribute('attributeName', 'opacity'); op.setAttribute('values', '0;1;1;0');
+    op.setAttribute('keyTimes', '0;.1;.8;1');
+    op.setAttribute('dur', dur + 's'); op.setAttribute('begin', dly + 's'); op.setAttribute('fill', 'freeze');
+    g.setAttribute('opacity', 0);
+    g.appendChild(rect); g.appendChild(tr); g.appendChild(op);
+    svg.appendChild(g);
+  }
+  $('#fx').appendChild(svg);
+  setTimeout(() => svg.remove(), 2400);
+}
+
+/* ================= Tipps-Karussell (px-basiert) ================= */
+const car = { i:0, w:0, drag:false, sx:0, dx:0 };
+function initCar(){
+  const trk = $('#carTrk'); if(!trk) return;
+  const cw = trk.parentElement.clientWidth;
+  car.w = cw - 64;                       // Karte schmaler als Container → nächste lugt hervor
+  car.i = Math.min(car.i, TIPS.length - 1);
+  trk.querySelectorAll('.tip').forEach(el => el.style.width = car.w + 'px');
+  setCar(false);
+  trk.onpointerdown = e => {
+    car.drag = true; car.sx = e.clientX; car.dx = 0;
+    trk.style.transition = 'none';
+    trk.setPointerCapture(e.pointerId);
+  };
+  trk.onpointermove = e => {
+    if(!car.drag) return;
+    car.dx = e.clientX - car.sx;
+    trk.style.transform = 'translateX(' + (-car.i * (car.w + 12) + car.dx) + 'px)';
+  };
+  trk.onpointerup = trk.onpointercancel = e => {
+    if(!car.drag) return;
+    car.drag = false;
+    if(Math.abs(car.dx) > 48) car.i = Math.max(0, Math.min(TIPS.length - 1, car.i + (car.dx < 0 ? 1 : -1)));
+    setCar(true);
+  };
+}
+function setCar(anim){
+  const trk = $('#carTrk'); if(!trk) return;
+  trk.style.transition = anim ? 'transform .55s var(--spring)' : 'none';
+  trk.style.transform = 'translateX(' + (-car.i * (car.w + 12)) + 'px)';
+  const dots = $('#carDots');
+  if(dots) dots.querySelectorAll('i').forEach((d, j) => d.classList.toggle('on', j === car.i));
+}
+
+/* ================= Erststart ================= */
+function showSetup(){
+  pop('<div style="text-align:center;font-size:44px">👋</div>' +
+    '<h2 style="text-align:center">Willkommen bei Curacon!</h2>' +
+    '<p class="p" style="text-align:center">Schön, dass du da bist. Zwei Angaben, dann begleiten wir dich durch deine ersten 90 Tage.</p>' +
+    '<div class="lbl">Wie heißt du?</div>' +
+    '<input class="inp" id="suN" placeholder="Vorname (und Nachname)">' +
+    '<div class="lbl">Dein erster Arbeitstag</div>' +
+    '<input class="inp" id="suD" type="date" value="' + esc(S.profile.start || todayISO()) + '">' +
+    '<div class="lbl">Standort <span style="font-weight:400">(optional)</span></div>' +
+    '<input class="inp" id="suO" placeholder="z. B. Münster">' +
+    '<div style="margin-top:20px"><button class="btn" onclick="doSetup()">Los geht\'s</button></div>',
+    { dismiss:false });
+}
+function doSetup(){
+  const n = ($('#suN').value || '').trim();
+  if(!n){ $('#suN').style.borderColor = 'var(--red)'; $('#suN').focus(); return; }
+  S.profile.name = n;
+  S.profile.start = $('#suD').value || todayISO();
+  S.profile.ort = ($('#suO').value || '').trim();
+  S.setup = true; save();
+  closePop(); rHome();
+  confetti();
+  toast('Willkommen an Bord! 🎉');
+}
+
+/* ================= Service Worker & Update-Flow ================= */
+let swReg = null;
+function promptUpdate(worker){
+  pop('<h2>Neue Version 🚀</h2><p class="p">Eine neue Version von Curacon Onboarding ist verfügbar. Jetzt laden?</p>' +
+    '<button class="btn" id="updBtn">Aktualisieren</button>' +
+    '<button class="btn gray" onclick="closePop()">Später</button>');
+  $('#updBtn').onclick = () => {
+    S.pup = true; save();
+    worker.postMessage({ type:'SKIP_WAITING' });
+  };
+}
+function checkUpdate(){
+  if(!swReg){ toast('Offline-Modus aktiv'); return; }
+  toast('Suche nach Updates …');
+  swReg.update().catch(() => {});
+  setTimeout(() => { if(!swReg.waiting && !swReg.installing) toast('Du bist auf dem neuesten Stand ✓'); }, 2500);
+}
+if('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')){
+  navigator.serviceWorker.register('./sw.js').then(reg => {
+    swReg = reg;
+    if(reg.waiting && navigator.serviceWorker.controller) promptUpdate(reg.waiting);
+    reg.addEventListener('updatefound', () => {
+      const nw = reg.installing;
+      nw && nw.addEventListener('statechange', () => {
+        if(nw.state === 'installed' && navigator.serviceWorker.controller) promptUpdate(nw);
+      });
+    });
+  }).catch(() => {});
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if(refreshing) return; refreshing = true; location.reload();
+  });
+  document.addEventListener('visibilitychange', () => {
+    if(document.visibilityState === 'visible' && swReg) swReg.update().catch(() => {});
+  });
+}
+
+/* ================= Sticky-Header-Observer ================= */
+document.querySelectorAll('.pg').forEach(pg => {
+  const sent = pg.querySelector('.sent'), hdr = pg.querySelector('.hdr');
+  if(!sent || !hdr) return;
+  new IntersectionObserver(es => hdr.classList.toggle('sc', !es[0].isIntersecting), { root: pg }).observe(sent);
+});
+
+/* ================= Boot ================= */
+addEventListener('resize', () => {
+  const btn = document.querySelector('.tb.on');
+  if(btn) moveInd(btn);
+  if($('#pg-home').classList.contains('active')) initCar();
+});
+
+rHome();
+requestAnimationFrame(() => moveInd($('#tb-home')));
+
+if(S.pup){
+  S.pup = false; save();
+  pop('<div style="text-align:center;font-size:44px">🎉</div>' +
+    '<h2 style="text-align:center">Update installiert!</h2>' +
+    '<p class="p" style="text-align:center">Du nutzt jetzt Version ' + APP_VERSION + '.</p>' +
+    '<div class="lbl" style="margin-top:4px">Das ist neu:</div><ul class="chlist">' +
+    CHANGES.map(c => '<li>' + esc(c) + '</li>').join('') + '</ul>' +
+    '<button class="btn" onclick="closePop()">Los geht\'s</button>',
+    { dismiss:false });
+}else if(!S.setup){
+  showSetup();
+}
+</script>
+</body>
+</html>
