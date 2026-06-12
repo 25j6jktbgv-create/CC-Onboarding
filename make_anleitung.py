@@ -6,7 +6,7 @@ from reportlab.pdfgen import canvas
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 OUT = "Installationsanleitung.pdf"
-APP_URL = "https://<euer-account>.github.io/curacon-onboarding"
+APP_URL = "https://25j6jktbgv-create.github.io/CC-Onboarding/"
 
 RED    = HexColor("#C62635")
 RED2   = HexColor("#A70C15")

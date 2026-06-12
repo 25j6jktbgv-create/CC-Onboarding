@@ -42,6 +42,7 @@
   }
 }
 *{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html,body{margin:0;height:100%}
 body{
   font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;
@@ -68,6 +69,12 @@ body{
   box-shadow:0 1px 0 var(--sep)}
 .hdr h1{margin:0; font-size:31px; font-weight:800; letter-spacing:-.5px}
 .hdr .sub{margin-top:2px; font-size:14px; font-weight:500; color:var(--ink2)}
+
+/* Große Screens (iPad/Desktop): Inhalt als zentrierte Spalte statt voller Breite */
+@media (min-width:700px){
+  .pg{padding-left:calc(50vw - 292px); padding-right:calc(50vw - 292px)}
+  .hdr{margin:0 calc(292px - 50vw); padding-left:calc(50vw - 292px); padding-right:calc(50vw - 292px)}
+}
 
 /* ---------- Bausteine ---------- */
 .card{background:var(--card); border-radius:var(--r-lg); padding:18px; box-shadow:var(--shadow)}
@@ -128,7 +135,7 @@ body{
 
 /* Phasen-Zeile */
 .phrow{display:flex; align-items:center; gap:12px; padding:12px 14px}
-.phrow .nm{font-size:15px; font-weight:600; width:118px; flex:none}
+.phrow .nm{font-size:15px; font-weight:600; width:136px; flex:none; display:flex; align-items:center; white-space:nowrap}
 .phrow .ct{font-size:13px; font-weight:700; color:var(--ink2); width:34px; text-align:right; flex:none}
 .badge{font-size:10px; font-weight:800; letter-spacing:.5px; color:#fff; background:var(--cur);
   border-radius:999px; padding:2px 7px; margin-left:6px; vertical-align:2px}
@@ -268,12 +275,11 @@ body{
 <script>
 'use strict';
 /* ================= Version & Changelog ================= */
-const APP_VERSION = 'v1';
+const APP_VERSION = 'v2';
 const CHANGES = [
-  'Aufgaben-Checkliste für deine ersten 90 Tage',
-  'Persönlicher Fortschritt mit Tageszähler',
-  'Team-Kontakte zum Kennenlernen & Abhaken',
-  'FAQ, Glossar und Tipps für den Start'
+  'Layout passt sich allen Displaygrößen an – iPhone, iPad & Desktop',
+  'Fortschrittszeilen brechen nicht mehr um',
+  'Startkarte aufgeräumt & Schrift-Rendering verbessert'
 ];
 
 /* ================= Daten-Helfer ================= */
@@ -465,7 +471,7 @@ function heroDeco(){
   let s = '<svg class="deco" viewBox="0 0 400 160" preserveAspectRatio="xMidYMid slice">';
   for(let i = 0; i < 9; i++){
     const o = (0.07 + r() * 0.13).toFixed(2);
-    s += '<circle cx="' + (r()*400).toFixed(0) + '" cy="' + (r()*160).toFixed(0) + '" r="' + (10 + r()*38).toFixed(0) + '" ' +
+    s += '<circle cx="' + (r()*250).toFixed(0) + '" cy="' + (r()*160).toFixed(0) + '" r="' + (10 + r()*38).toFixed(0) + '" ' +
       'fill="' + cols[Math.floor(r()*cols.length)] + '" opacity="' + o + '">' +
       '<animate attributeName="opacity" values="' + o + ';' + (o*1.9).toFixed(2) + ';' + o + '" dur="' + (4 + r()*4).toFixed(1) + 's" repeatCount="indefinite"/></circle>';
   }
