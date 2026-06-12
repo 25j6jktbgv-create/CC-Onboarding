@@ -56,7 +56,7 @@ body{
 
 /* ---------- Seiten ---------- */
 .pg{position:absolute; inset:0; overflow-y:auto; -webkit-overflow-scrolling:touch;
-  padding:0 16px calc(112px + env(safe-area-inset-bottom));
+  padding:0 16px calc(112px + min(env(safe-area-inset-bottom, 0px), 30px));
   padding-left:calc(16px + env(safe-area-inset-left));
   padding-right:calc(16px + env(safe-area-inset-right));
   display:none}
@@ -178,7 +178,7 @@ body{
 
 /* ---------- Tab-Leiste ---------- */
 #tabbar{position:fixed; left:0; right:0; bottom:0; z-index:50; display:flex;
-  padding:6px 10px calc(env(safe-area-inset-bottom) + 4px);
+  padding:6px 10px calc(min(env(safe-area-inset-bottom, 0px), 30px) + 4px);
   background:var(--frost); -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
   border-top:1px solid var(--sep)}
 #tind{position:absolute; top:7px; left:0; width:58px; height:32px; border-radius:999px;
@@ -208,7 +208,7 @@ body{
 .chlist li::before{content:'✦'; color:var(--cur); font-weight:800; flex:none}
 
 /* Toast */
-#toast{position:fixed; left:50%; bottom:calc(104px + env(safe-area-inset-bottom)); z-index:200;
+#toast{position:fixed; left:50%; bottom:calc(104px + min(env(safe-area-inset-bottom, 0px), 30px)); z-index:200;
   transform:translateX(-50%) translateY(16px); opacity:0; pointer-events:none;
   background:var(--ink); color:var(--bg); padding:11px 20px; border-radius:999px;
   font-size:14px; font-weight:700; white-space:nowrap; transition:.4s var(--spring)}
@@ -216,6 +216,9 @@ body{
 
 /* Konfetti */
 #fx{position:fixed; inset:0; z-index:300; pointer-events:none}
+
+/* Messfühler für env(safe-area-inset-bottom) */
+#sap{position:fixed; left:-9999px; top:0; width:1px; height:env(safe-area-inset-bottom, 0px); visibility:hidden; pointer-events:none}
 </style>
 </head>
 <body>
@@ -273,15 +276,16 @@ body{
   <div id="ovl"></div>
   <div id="toast"></div>
   <div id="fx"></div>
+  <div id="sap"></div>
 </div>
 
 <script>
 'use strict';
 /* ================= Version & Changelog ================= */
-const APP_VERSION = 'v3';
+const APP_VERSION = 'v4';
 const CHANGES = [
-  'Installations-Hinweis, wenn die App im Browser statt als App läuft',
-  'Feinschliff unter der Haube'
+  'Tab-Leiste: überflüssiger Leerraum am unteren Bildschirmrand entfernt',
+  'Anzeige-Diagnose im Profil (Auflösung, Insets, Modus)'
 ];
 
 /* ================= Daten-Helfer ================= */
@@ -638,6 +642,9 @@ function rProf(){
     '<div class="sec">App</div>' +
     '<div class="lg">' +
       '<div class="row" style="cursor:default"><div class="tx"><div class="tt">Version</div></div><div class="chev" style="font-size:15px">' + APP_VERSION + '</div></div>' +
+      '<div class="row" style="cursor:default"><div class="tx"><div class="tt">Anzeige</div></div><div class="chev" style="font-size:13px">' +
+        innerWidth + '×' + innerHeight + ' · Inset ' + (document.getElementById('sap') ? document.getElementById('sap').offsetHeight : 0) + 'px · ' +
+        (isStandalone() ? 'App' : 'Browser') + '</div></div>' +
       '<div class="row" onclick="showChanges()"><div class="tx"><div class="tt">Das ist neu</div></div><div class="chev">›</div></div>' +
       '<div class="row" onclick="checkUpdate()"><div class="tx"><div class="tt">Nach Updates suchen</div></div><div class="chev">›</div></div>' +
     '</div>' +
