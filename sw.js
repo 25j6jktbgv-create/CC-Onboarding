@@ -1,5 +1,5 @@
 /* Curacon Onboarding – Service Worker */
-const CACHE = 'curacon-onb-v7';
+const CACHE = 'curacon-onb-v8';
 const ASSETS = [
   './',
   './index.html',
