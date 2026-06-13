@@ -52,10 +52,7 @@ body{
   -webkit-user-select:none; user-select:none;
   overscroll-behavior:none;
 }
-#app{position:fixed; top:0; left:0; right:0; bottom:0; overflow:hidden}
-/* iOS 26 meldet installierten Apps einen zu kurzen Layout-Viewport (svh<lvh).
-   100lvh = voller Bildschirm; nur im Standalone-Modus, Browser bleibt unberührt. */
-html.standalone #app{bottom:auto; height:100lvh}
+#app{position:fixed; inset:0; overflow:hidden}
 
 /* ---------- Seiten ---------- */
 .pg{position:absolute; inset:0; overflow-y:auto; -webkit-overflow-scrolling:touch;
@@ -180,7 +177,7 @@ html.standalone #app{bottom:auto; height:100lvh}
 .stats>div:not(:last-child){border-right:1px solid var(--sep)}
 
 /* ---------- Tab-Leiste ---------- */
-#tabbar{position:absolute; left:0; right:0; bottom:0; z-index:50; display:flex;
+#tabbar{position:fixed; left:0; right:0; bottom:0; z-index:50; display:flex;
   padding:6px 10px calc(env(safe-area-inset-bottom) + 6px);
   background:var(--frost); -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
   border-top:1px solid var(--sep)}
@@ -193,7 +190,7 @@ html.standalone #app{bottom:auto; height:100lvh}
 .tb.on{color:var(--cur)}
 
 /* ---------- Overlay / Sheets ---------- */
-#ovl{position:absolute; inset:0; z-index:100; display:none; align-items:center; justify-content:center;
+#ovl{position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center;
   padding:24px; background:rgba(0,0,0,.45); -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px)}
 #ovl.show{display:flex}
 .sheet{background:var(--card); border-radius:26px; padding:24px; width:100%; max-width:400px;
@@ -211,14 +208,14 @@ html.standalone #app{bottom:auto; height:100lvh}
 .chlist li::before{content:'✦'; color:var(--cur); font-weight:800; flex:none}
 
 /* Toast */
-#toast{position:absolute; left:50%; bottom:calc(104px + env(safe-area-inset-bottom)); z-index:200;
+#toast{position:fixed; left:50%; bottom:calc(104px + env(safe-area-inset-bottom)); z-index:200;
   transform:translateX(-50%) translateY(16px); opacity:0; pointer-events:none;
   background:var(--ink); color:var(--bg); padding:11px 20px; border-radius:999px;
   font-size:14px; font-weight:700; white-space:nowrap; transition:.4s var(--spring)}
 #toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
 
 /* Konfetti */
-#fx{position:absolute; inset:0; z-index:300; pointer-events:none}
+#fx{position:fixed; inset:0; z-index:300; pointer-events:none}
 
 /* Messfühler: Safe-Area & Viewport-Einheiten */
 #sap,.probe{position:fixed; left:-9999px; top:0; width:1px; visibility:hidden; pointer-events:none}
@@ -289,9 +286,9 @@ html.standalone #app{bottom:auto; height:100lvh}
 <script>
 'use strict';
 /* ================= Version & Changelog ================= */
-const APP_VERSION = 'v8';
+const APP_VERSION = 'v9';
 const CHANGES = [
-  'Tab-Leiste nutzt die volle Bildschirmhöhe (100lvh) – kein Band mehr',
+  'Tab-Leiste wird nie mehr abgeschnitten (zurück zur stabilen Verankerung)',
   'Updates kommen jetzt zuverlässig & sofort an'
 ];
 
